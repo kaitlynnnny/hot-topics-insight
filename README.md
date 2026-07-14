@@ -95,12 +95,6 @@ hot-topics-insight/
 └── requirements.txt        # Python dependencies
 ```
 
-## Key Design Decisions
-
-- **9 independent Glean feeds** instead of 1: prevents source domination (first 2 sources filling quota)
-- **Programmatic fact verification** (not LLM-based): checks search results against 23 credible news domains
-- **Role-based personas** (not free-form debate): eliminates "is this news real?" arguments
-- **Blind review** (not round-robin): models don't see each other's output, preventing bias propagation
 
 ## Supported Models
 
