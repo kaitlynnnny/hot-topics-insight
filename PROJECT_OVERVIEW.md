@@ -1,4 +1,4 @@
-# Hot Topics Insight — 全球热点多模型辩论系统
+﻿# Hot Topics Insight — 全球热点多模型辩论系统
 
 ## 项目概述
 
@@ -78,7 +78,7 @@
 
 ## 二、文件结构与职责
 
-### 项目目录: `C:\Users\21947\hot-topics-insight\`
+### 项目目录: `~/projects\hot-topics-insight\`
 
 | 文件 | 行数 | 职责 |
 |------|------|------|
@@ -94,7 +94,7 @@
 | `ingest/reddit.py` | ~90 | Reddit 直接 API 采集（备用） |
 | `ingest/trends.py` | ~80 | Google Trends 采集（备用） |
 
-### Glean 配置: `C:\Users\21947\glean\`
+### Glean 配置: `~/projects\glean\`
 
 | 文件 | 职责 |
 |------|------|
@@ -110,7 +110,7 @@
 
 **执行命令:**
 ```powershell
-cd C:\Users\21947\glean
+cd ~/projects\glean
 .\run.ps1
 ```
 
@@ -164,7 +164,7 @@ Nitter 是免费开源的，无需 X API Key。但受限于 Twitter 的反爬，
 
 **执行命令:**
 ```powershell
-cd C:\Users\21947\hot-topics-insight
+cd ~/projects\hot-topics-insight
 python bridge.py 10 2    # 10 topics, max 2 concurrent
 ```
 
@@ -429,7 +429,7 @@ Python 3.12+
   scikit-learn             # 余弦相似度计算
   ddgs                     # DuckDuckGo 搜索（fact-check 用，当前未启用）
 
-Glean 依赖（C:\Users\21947\glean 独立环境）:
+Glean 依赖（~/projects\glean 独立环境）:
   glean==1.4.0             # 开源数据采集引擎（pip install -e .）
   feedparser               # RSS 解析
   aiosqlite                # SQLite 异步驱动
@@ -443,18 +443,18 @@ Glean 依赖（C:\Users\21947\glean 独立环境）:
 
 ### 方式 1: 一键脚本
 ```powershell
-powershell -File C:\Users\21947\hot-topics-insight\daily.ps1
+powershell -File ~/projects\hot-topics-insight\daily.ps1
 ```
 自动完成 Glean 采集 + bridge 辩论 + 打开报告。
 
 ### 方式 2: 分步运行
 ```powershell
 # 第一步: 采集新闻 (~2 分钟)
-cd C:\Users\21947\glean
+cd ~/projects\glean
 .\run.ps1
 
 # 第二步: 聚类 + 辩论 + 生成报告 (~5 分钟)
-cd C:\Users\21947\hot-topics-insight
+cd ~/projects\hot-topics-insight
 python bridge.py 10 2
 
 # 打开报告
@@ -483,7 +483,7 @@ python main.py --topics 8 --mock-llm
     render: {max_items: 15}
     sources: [{type: rss, url: "新源的RSS地址"}]
     pipeline: [dedup, {summarize: {prompt: "Summarize this in one sentence (max 25 words)."}}]
-    sinks: [{type: file, path: "C:/Users/21947/glean/output/glean-output.jsonl", format: jsonl, required: false}]
+    sinks: [{type: file, path: "~/projects/glean/output/glean-output.jsonl", format: jsonl, required: false}]
 ```
 2. 在 `run.ps1` 的 feed 列表中加入 `src-新源名`
 
@@ -530,5 +530,5 @@ python main.py --topics 8 --mock-llm
 ---
 
 *文档生成时间: 2026-07-13*
-*项目路径: C:\Users\21947\hot-topics-insight\*
-*Glean 配置: C:\Users\21947\glean\*
+*项目路径: ~/projects\hot-topics-insight\*
+*Glean 配置: ~/projects\glean\*
