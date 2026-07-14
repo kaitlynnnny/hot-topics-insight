@@ -1,0 +1,24 @@
+# API Keys — NEVER commit
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Output files
+output/report.html
+output/daily-digest.md
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
