@@ -108,8 +108,5 @@ hot-topics-insight/
 
 ## Documentation
 
-Full project documentation (in Chinese) is available at `docs/PROJECT_GUIDE.md`. Covers architecture, data flow, every file's purpose, and troubleshooting.
+Full project documentation is available at `docs/PROJECT_GUIDE.md`. Covers architecture, data flow, every file's purpose, and troubleshooting.
 
-## License
-
-MIT — do whatever you want with it.
