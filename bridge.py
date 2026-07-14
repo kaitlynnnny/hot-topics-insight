@@ -272,7 +272,7 @@ async def main():
     print(f"  {len(items)} unique articles (URL-deduped)")
 
     if not items:
-        print("[!] No data. Run Glean first: cd C:\\Users\\21947\\glean && .\\run.ps1")
+        print("[!] No data. Run Glean first, then re-run bridge.py")
         return
 
     # 2. Cluster

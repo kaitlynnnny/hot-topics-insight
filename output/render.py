@@ -1,9 +1,8 @@
 """
-Generate a clean, professional HTML report.
-- Section 1: Multi-LLM debate results (final agreement + justifications)
-- Section 2: All news articles
-- Export to Excel functionality
-- White/light theme, print-friendly
+Generate an HTML report from debate results and news articles.
+Section 1: debate results with agreement levels and justifications.
+Section 2: all news articles in a sortable table.
+Includes Excel/Word/PDF export via client-side JavaScript.
 """
 
 import json

@@ -5,7 +5,7 @@
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$GleanDir = "C:\Users\21947\glean"
+$GleanDir = Join-Path (Split-Path -Parent $ScriptDir) "glean"
 $Today = Get-Date -Format "yyyy-MM-dd"
 
 Write-Host "========================================" -ForegroundColor Cyan
