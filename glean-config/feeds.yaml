@@ -10,28 +10,28 @@ defaults:
 feeds:
   - name: src-aljazeera
     schedule: "every 2h"
-    render: {max_items: 15}
+    render: {max_items: 50}
     sources: [{type: rss, url: "https://www.aljazeera.com/xml/rss/all.xml"}]
     pipeline: [dedup, {summarize: {prompt: "Summarize this in one sentence (max 25 words)."}}]
     sinks: [{type: file, path: "./output/glean-output.jsonl", format: jsonl, required: false}]
 
   - name: src-guardian
     schedule: "every 2h"
-    render: {max_items: 15}
+    render: {max_items: 50}
     sources: [{type: rss, url: "https://www.theguardian.com/world/rss"}]
     pipeline: [dedup, {summarize: {prompt: "Summarize this in one sentence (max 25 words)."}}]
     sinks: [{type: file, path: "./output/glean-output.jsonl", format: jsonl, required: false}]
 
   - name: src-nytimes
     schedule: "every 2h"
-    render: {max_items: 15}
+    render: {max_items: 50}
     sources: [{type: rss, url: "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"}]
     pipeline: [dedup, {summarize: {prompt: "Summarize this in one sentence (max 25 words)."}}]
     sinks: [{type: file, path: "./output/glean-output.jsonl", format: jsonl, required: false}]
 
   - name: src-bbc
     schedule: "every 2h"
-    render: {max_items: 15}
+    render: {max_items: 50}
     sources: [{type: rss, url: "https://feeds.bbci.co.uk/news/world/rss.xml"}]
     pipeline: [dedup, {summarize: {prompt: "Summarize this in one sentence (max 25 words)."}}]
     sinks: [{type: file, path: "./output/glean-output.jsonl", format: jsonl, required: false}]
@@ -39,7 +39,7 @@ feeds:
   - name: src-hackernews
     schedule: "every 2h"
     render: {max_items: 15}
-    sources: [{type: hn, min_points: 30, window_hours: 8}]
+    sources: [{type: hn, min_points: 30, window_hours: 24}]
     pipeline: [dedup, {summarize: {prompt: "Summarize this in one sentence (max 25 words)."}}]
     sinks: [{type: file, path: "./output/glean-output.jsonl", format: jsonl, required: false}]
 

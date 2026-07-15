@@ -15,6 +15,10 @@ import json
 import os
 import sys
 from collections import Counter
+
+# Force UTF-8 on Windows console
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -43,7 +47,7 @@ CLUSTER_THRESHOLD = 0.70  # cosine similarity threshold for grouping
 def read_glean_output(path: Path) -> list[dict]:
     """Read JSONL, deduplicate by URL across multiple runs."""
     if not path.exists():
-        print(f"[!] {path} not found — run Glean first: cd ../glean && .\\run.ps1")
+        print(f"[!] {path} not found -- run Glean first")
         return []
 
     seen_urls = set()
@@ -221,7 +225,7 @@ def verify_topics(topics: list[dict]) -> tuple[list[dict], list[dict]]:
             print(f"    [VERIFIED] {t['title'][:70]}...")
         else:
             rejected.append(t)
-            print(f"    [REJECTED] {t['title'][:70]}... — no credible source match")
+            print(f"    [REJECTED] {t['title'][:70]}... -- no credible source match")
 
     return verified, rejected
 
