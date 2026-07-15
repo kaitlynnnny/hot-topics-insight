@@ -86,16 +86,16 @@ def _mock_analyze(topics: list[dict]) -> list:
 
     mock_insights = []
     perspectives = [
-        ("high", "This represents a significant shift with far-reaching implications.", "Strong consensus among all three analysts"),
-        ("partial", "While notable, the long-term impact remains uncertain.", "GPT sees more upside; Claude and DeepSeek are cautious"),
-        ("high", "A landmark development that will reshape the landscape for years to come.", "Broad agreement on importance, slight difference on timeline"),
-        ("partial", "The signal is clear but the timeline and execution are contested.", "Analysts differ on how quickly this will materialize"),
-        ("low", "Opinions diverge sharply on whether this is transformative or overblown.", "Claude is bullish, GPT skeptical, DeepSeek sees regional variance"),
+        ("high", "Growth Optimist sees opportunity, Risk Analyst flags vulnerabilities, Macro Strategist notes systemic shift."),
+        ("partial", "Optimist bullish on upside, Risk skeptical about timeline, Macro sees mixed signals."),
+        ("high", "Strong consensus on significance, minor divergence on pace of impact."),
+        ("partial", "Optimist sees quick gains, Risk warns of hidden costs, Macro calls for patience."),
+        ("low", "Sharp disagreement: Optimist sees paradigm shift, Risk calls it noise, Macro is conflicted."),
     ]
 
     for i, topic in enumerate(topics):
         title = topic["title"]
-        agree_level, insight_text, tension_text = perspectives[i % len(perspectives)]
+        agree_level, tension_text = perspectives[i % len(perspectives)]
         source_str = topic.get("source", "")
         if topic.get("subreddit"):
             source_str += f" (r/{topic['subreddit']})"
@@ -104,46 +104,16 @@ def _mock_analyze(topics: list[dict]) -> list:
             title=title,
             source_str=source_str,
             url=topic.get("url", ""),
-            # Stage 1: all 3 models analyze independently
-            claude_analysis={
-                "summary": f"Claude: {title.split('.')[0]} reflects deeper structural shifts in the global order.",
-                "significance": "The systemic implications extend beyond the immediate headlines, touching on governance, international norms, and long-term stability.",
-                "angle": "Geopolitical and systemic perspective",
-                "confidence": "high" if agree_level == "high" else "medium",
-            },
-            gpt_analysis={
-                "summary": f"GPT: {title.split('.')[0]} signals an inflection point for markets and innovation cycles.",
-                "significance": "Key implications for technology deployment, capital flows, and competitive dynamics across industries.",
-                "angle": "Technological and market perspective",
-                "confidence": "high" if agree_level != "low" else "medium",
-            },
-            deepseek_analysis={
-                "summary": f"DeepSeek: {title.split('.')[0]} has distinct implications for Asia-Pacific and the developing world.",
-                "significance": "The regional ripple effects — from supply chains to diplomatic alignments — are being underestimated by Western analysts.",
-                "angle": "Asia-Pacific and Global South perspective",
-                "confidence": "high" if agree_level != "low" else "medium",
-            },
-            # Stage 2: round-robin cross-reviews
-            claude_review={
-                "verdict": "agree" if agree_level == "high" else "partially_agree",
-                "comment": "GPT captures the market angle well, though I'd stress the institutional dimensions more.",
-                "supplement": "Watch for regulatory cascades across jurisdictions following this development.",
-            },
-            gpt_review={
-                "verdict": "agree" if agree_level != "low" else "partially_agree",
-                "comment": "DeepSeek's regional lens is valuable. The innovation diffusion angle deserves more emphasis.",
-                "supplement": "The speed of technology transfer here could surprise both bulls and bears.",
-            },
-            deepseek_review={
-                "verdict": "partially_agree" if agree_level != "high" else "agree",
-                "comment": "Claude's systemic framing is rigorous but Western-centric. The Global South impact is understated.",
-                "supplement": "BRICS nations are already positioning around this — watch their next summit.",
-            },
-            # Stage 3: synthesis
-            insight=f"This topic represents a {agree_level}-confidence signal. {insight_text}",
+            deepseek_analysis={"summary": f"[MOCK] {title}", "significance": "Growth opportunity with long-term upside.", "angle": "Growth Optimist", "confidence": "high"},
+            qwen_analysis={"summary": f"[MOCK] {title}", "significance": "Risk factors need closer scrutiny.", "angle": "Risk & Compliance", "confidence": "medium"},
+            gemini_analysis={"summary": f"[MOCK] {title}", "significance": "Part of a broader structural pattern.", "angle": "Macro Strategist", "confidence": "high"},
+            final_agreement=f"[MOCK] Synthesized insight: {title}",
             agreement_level=agree_level,
             key_tension=tension_text,
-            bottom_line=f"Bottom line: {title[:80]}",
+            bottom_line=f"[MOCK] Bottom line for: {title[:80]}",
+            deepseek_justification="Growth angle: positive long-term implications and market expansion opportunities.",
+            qwen_justification="Risk angle: regulatory exposure and compliance gaps require attention.",
+            gemini_justification="Macro angle: fits into larger structural realignment of global systems.",
         )
         mock_insights.append(ins)
         print(f"  [mock] {title[:80]}... -> {agree_level} agreement")
