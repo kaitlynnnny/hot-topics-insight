@@ -1,3 +1,7 @@
+import sys
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 """
 Multi-LLM debate engine v4 — Role-based blind analysis + Synthesizer.
 
