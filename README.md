@@ -7,8 +7,8 @@ Daily automated pipeline: **9 news sources → clustering → programmatic fact 
 ```
 Glean (data collection) → bridge.py (clustering + verification) → debate.py (role-based analysis) → render.py (HTML report)
 
-  9 News Sources     sentence-transformers    DeepSeek / Qwen / Gemini     White professional theme
-  RSS + Nitter RSS     cosine clustering     Growth / Risk / Macro roles   Excel/Word/PDF export
+  9 News Sources     sentence-transformers    DeepSeek / Qwen / Gemini     
+  RSS + Nitter RSS     cosine clustering     Growth / Risk / Macro roles  
 ```
 
 ## Quick Start
