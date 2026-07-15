@@ -95,17 +95,6 @@ hot-topics-insight/
 └── requirements.txt        # Python dependencies
 ```
 
-
-## Supported Models
-
-| Model | Status | Cost |
-|-------|--------|------|
-| DeepSeek V3 | Recommended | ~$0.27/M tokens |
-| Qwen Plus | Recommended | ~$0.50/M tokens |
-| Gemini 3.5 Flash | Optional (geo-restricted) | Free tier |
-| Claude Sonnet 4 | Optional | ~$3/M tokens |
-| GPT-4o-mini | Optional | ~$0.15/M tokens |
-
 ## Documentation
 
 Full project documentation is available at `docs/PROJECT_GUIDE.md`. Covers architecture, data flow, every file's purpose, and troubleshooting.
