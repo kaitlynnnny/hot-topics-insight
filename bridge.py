@@ -145,87 +145,124 @@ def cluster_topics(items: list[dict], threshold: float = CLUSTER_THRESHOLD) -> l
 
 # ── Step 3: Programmatic fact verification ─────────────
 
-# Credible news domains — any match in search results = verified
-CREDIBLE_DOMAINS = [
-    "bbc.co.uk", "bbc.com",
-    "reuters.com",
-    "apnews.com",
-    "nytimes.com",
-    "theguardian.com",
-    "aljazeera.com",
-    "cnn.com",
-    "washingtonpost.com",
-    "bloomberg.com",
-    "npr.org",
-    "cnbc.com",
-    "abcnews.go.com",
-    "cbsnews.com",
-    "nbcnews.com",
-    "wsj.com",
-    "economist.com",
-    "politico.com",
-    "thehindu.com",
-    "straitstimes.com",
-    "japantimes.co.jp",
-    "dw.com",
-    "france24.com",
+# Tier 1: top global outlets — 1 match is enough
+TIER1_DOMAINS = [
+    "bbc.co.uk", "bbc.com", "reuters.com", "apnews.com",
+    "nytimes.com", "theguardian.com", "aljazeera.com",
+    "cnn.com", "washingtonpost.com", "bloomberg.com",
+    "wsj.com", "npr.org", "cnbc.com", "abcnews.go.com",
+    "cbsnews.com", "nbcnews.com", "economist.com",
+    "politico.com", "dw.com", "france24.com",
 ]
+
+# Tier 2: regional & specialized — need 2 matches (or 1 + tier1)
+TIER2_DOMAINS = [
+    "thehindu.com", "straitstimes.com", "japantimes.co.jp",
+    "scmp.com", "nikkei.com", "timesofindia.indiatimes.com",
+    "al-monitor.com", "haaretz.com", "timesofisrael.com",
+    "af.reuters.com", "channelnewsasia.com", "ansa.it",
+    "elpais.com", "lemonde.fr", "spiegel.de",
+    "independent.co.uk", "telegraph.co.uk", "usatoday.com",
+    "latimes.com", "chicagotribune.com", "bostonglobe.com",
+    "sfchronicle.com", "theatlantic.com", "newyorker.com",
+    "vox.com", "axios.com", "techcrunch.com", "theverge.com",
+    "arstechnica.com", "wired.com", "nature.com", "science.org",
+    "ndtv.com", "dawn.com", "smh.com.au", "theage.com.au",
+    "rnz.co.nz", "bbc.com/zhongwen", "bbc.com/zhongwen/simp",
+]
+
+
+def _extract_keywords(title: str) -> str:
+    """Extract key search terms from a headline."""
+    import re
+    # Remove quotes, special chars, keep meaningful words
+    cleaned = re.sub(r'[^\w\s]', ' ', title)
+    words = [w for w in cleaned.split() if len(w) > 3 and w.lower()
+             not in ('this', 'that', 'with', 'from', 'they', 'their',
+                     'have', 'been', 'were', 'after', 'over', 'into',
+                     'about', 'what', 'when', 'where', 'which', 'there')]
+    # Take key words (first 6-8 substantive words)
+    return ' '.join(words[:8])
 
 
 def verify_topic(topic: dict) -> tuple[bool, str]:
     """
     Programmatic fact verification — NO LLM involved.
-    Searches the web for the headline, checks if any credible
-    news domain appears in search results.
+    1. Extract keywords from headline
+    2. Search the web
+    3. Check multi-tier domain matching
+    4. Cluster size boosts confidence (already multi-source = already vetted)
 
     Returns: (is_verified, evidence_string)
     """
     from analyze.clients import search_web
 
     title = topic["title"]
-    results = search_web(f'"{title}"', max_results=8)
+    cluster_size = topic.get("num_comments", 1)
+    keywords = _extract_keywords(title)
+
+    # Search with keywords (not exact title) for broader matching
+    results = search_web(f'{keywords} news', max_results=8)
 
     if results.startswith("[Web search") or results.startswith("[No search"):
-        # Search unavailable — pass it through (don't block real news)
+        # If cluster already has 2+ sources, trust the cluster
+        if cluster_size >= 2:
+            return True, f"[Multi-source cluster ({cluster_size} articles) — passing through]"
         return True, "[Search unavailable — passing through]"
 
-    # Count credible source matches
     results_lower = results.lower()
-    matched_domains = []
-    for domain in CREDIBLE_DOMAINS:
-        if domain in results_lower:
-            matched_domains.append(domain)
 
-    # Brief excerpt of search results for the debate prompt
+    # Count matches by tier
+    tier1_matches = [d for d in TIER1_DOMAINS if d in results_lower]
+    tier2_matches = [d for d in TIER2_DOMAINS if d in results_lower]
+
+    # Scoring
+    tier1_score = len(tier1_matches)
+    tier2_score = len(tier2_matches)
+    cluster_bonus = min(cluster_size - 1, 3)  # each extra source in cluster = +1 bonus, capped at 3
+
+    total_score = tier1_score * 3 + tier2_score + cluster_bonus
+
+    # Evidence for debate prompt
     lines = results.split("\n")
     evidence = "\n".join(lines[:6]) if len(lines) > 6 else results
     evidence = evidence[:600]
 
-    if matched_domains:
-        return True, f"Verified by: {', '.join(matched_domains[:5])}\nSearch evidence:\n{evidence}"
+    matched = tier1_matches + tier2_matches
+
+    # Decision logic
+    if tier1_score >= 1:
+        # At least 1 Tier-1 match → verified
+        return True, f"Verified by Tier-1: {', '.join(tier1_matches[:4])}\nSearch evidence:\n{evidence}"
+    elif tier2_score >= 2:
+        # 2+ Tier-2 matches → verified
+        return True, f"Verified by Tier-2: {', '.join(tier2_matches[:4])}\nSearch evidence:\n{evidence}"
+    elif tier1_score >= 1 or (tier2_score >= 1 and cluster_size >= 2):
+        # 1 Tier-1 OR (1 Tier-2 + cluster of 2+) → verified
+        return True, f"Verified (mixed): Tier-1={tier1_score}, Tier-2={tier2_score}, cluster={cluster_size}\nSearch evidence:\n{evidence}"
+    elif cluster_size >= 3:
+        # 3+ sources already reporting this → verified even without search match
+        return True, f"Verified by cluster confidence ({cluster_size} sources)\nSearch evidence:\n{evidence}"
+    elif total_score >= 2:
+        return True, f"Verified (score={total_score})\nSearch evidence:\n{evidence}"
     else:
-        return False, f"No credible source found. Search results:\n{evidence}"
+        return False, f"No credible source found (tier1={tier1_score}, tier2={tier2_score}, cluster={cluster_size}). Results:\n{evidence}"
 
 
 def verify_topics(topics: list[dict]) -> tuple[list[dict], list[dict]]:
-    """
-    Split topics into verified (pass to debate) and rejected (skip).
-
-    Returns: (verified_topics, rejected_topics)
-    """
+    """Split topics into verified and rejected."""
     verified = []
     rejected = []
 
     for t in topics:
         is_real, evidence = verify_topic(t)
         if is_real:
-            # Attach verification evidence to topic for debate context
             t["verification_evidence"] = evidence
             verified.append(t)
             print(f"    [VERIFIED] {t['title'][:70]}...")
         else:
             rejected.append(t)
-            print(f"    [REJECTED] {t['title'][:70]}... -- no credible source match")
+            print(f"    [REJECTED] {t['title'][:70]}... (t1=0 t2=0 cluster={t.get('num_comments',1)})")
 
     return verified, rejected
 
